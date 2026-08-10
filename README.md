@@ -74,8 +74,10 @@ their data between devices.
 
 The first time anyone opens the page with nothing saved yet (a fresh
 browser, or after clearing storage), it automatically loads with sample
-data pre-populated — it cedes to your own data and dashboard the moment
-you begin to save your own data.
+data pre-populated. **That sample data doesn't disappear or get
+overwritten automatically** — it stays right alongside anything real you
+add, each entry marked with a small **"Sample"** tag, until you delete it
+yourself with that card's trash icon. Nothing gets cleared on your behalf.
 
 ## Credits
 

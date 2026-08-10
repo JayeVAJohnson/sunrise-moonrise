@@ -179,7 +179,7 @@ function sampleOpp(overrides) {
     date: daysFromToday(off),
   }));
   const reached = Array.from(new Set(history.map((h) => h.status)));
-  return { ...base, ...overrides, status, history, reachedStatuses: reached };
+  return { ...base, ...overrides, status, history, reachedStatuses: reached, isSample: true };
 }
 
 function buildSampleData() {
@@ -241,14 +241,14 @@ function buildSampleData() {
   ];
 
   const resumes = [
-    { id: uid(), name: "Writing-focused v3", link: "https://docs.google.com/", tags: ["Call for Writers", "Call for Papers", "Education"], notes: "Leads with published clips, trims the retail job history.", updated: daysFromToday(-10) },
-    { id: uid(), name: "Tech/ops generalist v2", link: "https://onedrive.live.com/", tags: ["Job Search — FT", "Job Search — PT", "Contract", "Bootcamp"], notes: "Leads with project outcomes and tools, no publication list.", updated: daysFromToday(-25) },
+    { id: uid(), name: "Writing-focused v3", link: "https://docs.google.com/", tags: ["Call for Writers", "Call for Papers", "Education"], notes: "Leads with published clips, trims the retail job history.", updated: daysFromToday(-10), isSample: true },
+    { id: uid(), name: "Tech/ops generalist v2", link: "https://onedrive.live.com/", tags: ["Job Search — FT", "Job Search — PT", "Contract", "Bootcamp"], notes: "Leads with project outcomes and tools, no publication list.", updated: daysFromToday(-25), isSample: true },
   ];
 
   const lessons = [
-    { id: uid(), date: daysFromToday(-18), text: "The Northgate rejection feedback said the proposal was strong but the cohort was 40:1 — worth reapplying, not worth rewriting from scratch.", oppId: opps[2].id, oppTitle: opps[2].title },
-    { id: uid(), date: daysFromToday(-2), text: "In interviews, leading with the mixed-methods research story lands better than leading with tools/software list.", oppId: opps[5].id, oppTitle: opps[5].title },
-    { id: uid(), date: daysFromToday(-45), text: "General: pitches that name a specific section/editor get replies faster than general submissions inbox.", oppId: null, oppTitle: null },
+    { id: uid(), date: daysFromToday(-18), text: "The Northgate rejection feedback said the proposal was strong but the cohort was 40:1 — worth reapplying, not worth rewriting from scratch.", oppId: opps[2].id, oppTitle: opps[2].title, isSample: true },
+    { id: uid(), date: daysFromToday(-2), text: "In interviews, leading with the mixed-methods research story lands better than leading with tools/software list.", oppId: opps[5].id, oppTitle: opps[5].title, isSample: true },
+    { id: uid(), date: daysFromToday(-45), text: "General: pitches that name a specific section/editor get replies faster than general submissions inbox.", oppId: null, oppTitle: null, isSample: true },
   ];
 
   const prefs = {
@@ -258,8 +258,8 @@ function buildSampleData() {
   };
 
   const calendarEvents = [
-    { id: uid(), title: "Portfolio review with mentor", date: daysFromToday(5), note: "Bring the Palmer Studio case study.", source: "manual" },
-    { id: uid(), title: "Follow up with Firstline Fund", date: daysFromToday(1), note: "Confirm they received the revised budget sheet.", source: "manual" },
+    { id: uid(), title: "Portfolio review with mentor", date: daysFromToday(5), note: "Bring the Palmer Studio case study.", source: "manual", isSample: true },
+    { id: uid(), title: "Follow up with Firstline Fund", date: daysFromToday(1), note: "Confirm they received the revised budget sheet.", source: "manual", isSample: true },
   ];
 
   return { opps, resumes, lessons, prefs, calendarEvents };
@@ -921,6 +921,7 @@ function Card({ o, onEdit, onDelete, onStatusChange }) {
       <div className="ot-card-title">{o.title || "Untitled"}</div>
       {o.org && <div className="ot-card-org">{o.org}</div>}
       <div className="ot-card-foot">
+        {o.isSample && <span className="ot-sample-tag">Sample</span>}
         {o.deadline
           ? <span className={"ot-badge " + u.cls}>{u.label}</span>
           : <span className="ot-badge u-none">no deadline</span>}
@@ -950,7 +951,7 @@ function InProgressView({ list, onEdit, onSubmit }) {
           <div className="ot-drow" key={o.id}>
             <span className={"ot-badge " + u.cls}>{u.label}</span>
             <div className="ot-drow-main" onClick={() => onEdit(o)}>
-              <div className="ot-drow-title">{o.title || "Untitled"}</div>
+              <div className="ot-drow-title">{o.title || "Untitled"} {o.isSample && <span className="ot-sample-tag">Sample</span>}</div>
               <div className="ot-drow-sub">{o.org} · {o.category}</div>
             </div>
             <button className="ot-btn ot-btn-ghost ot-btn-sm" onClick={() => onSubmit(o)}>Mark submitted</button>
@@ -972,7 +973,7 @@ function AppliedView({ list, onEdit }) {
         <div className="ot-drow" key={o.id} onClick={() => onEdit(o)}>
           <span className="ot-badge u-none">{STATUS_MAP[o.status]?.label}</span>
           <div className="ot-drow-main">
-            <div className="ot-drow-title">{o.title || "Untitled"}</div>
+            <div className="ot-drow-title">{o.title || "Untitled"} {o.isSample && <span className="ot-sample-tag">Sample</span>}</div>
             <div className="ot-drow-sub">{o.org} · {o.category}</div>
           </div>
           {o.deadline && <div className="ot-drow-date">{o.deadline}</div>}
@@ -994,7 +995,7 @@ function NotYetView({ list, onEdit, onSubmit }) {
           <div className="ot-drow" key={o.id}>
             <span className={"ot-badge " + u.cls}>{u.label}</span>
             <div className="ot-drow-main" onClick={() => onEdit(o)}>
-              <div className="ot-drow-title">{o.title || "Untitled"}</div>
+              <div className="ot-drow-title">{o.title || "Untitled"} {o.isSample && <span className="ot-sample-tag">Sample</span>}</div>
               <div className="ot-drow-sub">{o.org} · {o.category}</div>
             </div>
             <button className="ot-btn ot-btn-ghost ot-btn-sm" onClick={() => onSubmit(o)}>Mark submitted</button>
@@ -1061,7 +1062,7 @@ function DeadlinesView({ list, onOpen, onAddEvent, onImportEvents, flash }) {
               <div className="ot-drow" key={item.key} onClick={() => onOpen(item)}>
                 <span className={"ot-badge " + u.cls}>{u.label}</span>
                 <div className="ot-drow-main">
-                  <div className="ot-drow-title">{item.title}</div>
+                  <div className="ot-drow-title">{item.title} {item.ref?.isSample && <span className="ot-sample-tag">Sample</span>}</div>
                   <div className="ot-drow-sub">{item.sub}{item.statusLabel ? ` · ${item.statusLabel}` : ""}{item.kind === "event" ? " · calendar" : ""}</div>
                 </div>
                 <div className="ot-drow-date">{item.date}</div>
@@ -1117,7 +1118,7 @@ function HistoryCard({ o, onEdit, onToggleFlag }) {
       <div className="ot-hcard-head" onClick={() => setOpen((v) => !v)}>
         <ChevronRight size={15} className={"ot-chev" + (open ? " open" : "")} />
         <div className="ot-hcard-main">
-          <div className="ot-hcard-title">{o.title || "Untitled"}</div>
+          <div className="ot-hcard-title">{o.title || "Untitled"} {o.isSample && <span className="ot-sample-tag">Sample</span>}</div>
           <div className="ot-hcard-sub">{o.org} · {o.category} · <span className="ot-hcard-status">{STATUS_MAP[o.status]?.label}</span></div>
         </div>
         <button className={"ot-flag" + (o.flagged ? " on" : "")} onClick={(e) => { e.stopPropagation(); onToggleFlag(o); }}
@@ -1192,6 +1193,7 @@ function LessonsView({ lessons, setLessons, opps }) {
               <div className="ot-lesson-top">
                 <span className="ot-lesson-date">{l.date}</span>
                 {l.oppTitle && <span className="ot-badge u-none">{l.oppTitle}</span>}
+                {l.isSample && <span className="ot-sample-tag">Sample</span>}
                 <button className="ot-removefield-btn" onClick={() => remove(l.id)}><CircleMinus size={14} /></button>
               </div>
               <p>{l.text}</p>
@@ -1279,7 +1281,7 @@ function ResumesView({ resumes, onAdd, onEdit, onDelete }) {
           {resumes.map((r) => (
             <div className="ot-resumecard" key={r.id}>
               <div className="ot-resumecard-top">
-                <span className="ot-resumecard-name">{r.name || "Untitled version"}</span>
+                <span className="ot-resumecard-name">{r.name || "Untitled version"} {r.isSample && <span className="ot-sample-tag">Sample</span>}</span>
                 <div className="ot-card-actions">
                   <button onClick={() => onEdit(r)}><Pencil size={12} /></button>
                   <button onClick={() => onDelete(r.id)}><Trash2 size={12} /></button>
@@ -1390,6 +1392,15 @@ function ManualView() {
         <p>Import an <code>.ics</code> file (downloaded from Google/Outlook/Apple Calendar) to pull in dated
           events. Pasting a live calendar link is a best-effort attempt — most providers block this from a
           browser app for security reasons, so the file import is the reliable path.</p>
+      </section>
+
+      <section>
+        <h3>Sample data</h3>
+        <p>The app comes pre-loaded with sample opportunities, resumes, and lessons so it's never empty when
+          you open it. Each one carries a small <strong>"Sample"</strong> tag. It doesn't disappear or get
+          overwritten automatically when you add your own — it stays right alongside your real entries until
+          you delete it yourself with that card's trash icon. Delete them at your own pace, or leave a few as
+          reference — nothing happens without you clicking delete.</p>
       </section>
 
       <section>
@@ -1832,6 +1843,11 @@ const CSS = `
 .u-warm{ color:var(--amber); border-color:var(--amber); }
 .u-hot{ color:var(--red); border-color:var(--red); }
 .u-over{ color:#fff; background:var(--red); border-color:var(--red); }
+.ot-sample-tag{
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:10px; padding:1px 6px; border-radius:4px;
+  background:var(--amber); color:#fff; font-weight:600; letter-spacing:0.02em; white-space:nowrap;
+  vertical-align:middle;
+}
 .ot-link{ color:var(--muted); display:flex; }
 .ot-muted-icon{ color:var(--muted); }
 .ot-card-select{
