@@ -613,6 +613,9 @@ export default function App() {
     <div className="ot-root">
       <style>{CSS}</style>
 
+      <a className="ot-gh-badge" href="https://github.com/JayeVAJohnson/sunrise-moonrise"
+        target="_blank" rel="noopener noreferrer">View on GitHub</a>
+
       <header className="ot-header">
         <div className="ot-header-inner">
           <div className="ot-brand"><span className="ot-logo-frame"><LogoMark size={192} /></span>
@@ -856,31 +859,50 @@ function AttachmentField({ image, onChange }) {
 }
 
 function BoardView({ opps, onEdit, onDelete, onStatusChange }) {
+  const scrollRef = useRef(null);
+  const [showFade, setShowFade] = useState(true);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const update = () => {
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+      setShowFade(el.scrollWidth > el.clientWidth && !atEnd);
+    };
+    update();
+    el.addEventListener("scroll", update);
+    window.addEventListener("resize", update);
+    return () => { el.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
+  }, [opps]);
+
   if (!opps.length) {
     return <div className="ot-empty"><p>No opportunities logged yet.</p>
       <p className="ot-empty-sub">Add one, or paste a listing into "Paste It In" to get a head start on the fields.</p></div>;
   }
   return (
-    <div className="ot-board">
-      {BOARD_ORDER.map((statusKey) => {
-        const col = STATUS_MAP[statusKey];
-        const items = opps.filter((o) => o.status === statusKey);
-        return (
-          <div className="ot-col" key={statusKey}>
-            <div className="ot-col-head">
-              <span className="ot-dot" style={{ background: col.color }} />
-              <span>{col.label}</span>
-              <em>{items.length}</em>
+    <div className="ot-board-wrap">
+      <div className="ot-board" ref={scrollRef}>
+        {BOARD_ORDER.map((statusKey) => {
+          const col = STATUS_MAP[statusKey];
+          const items = opps.filter((o) => o.status === statusKey);
+          return (
+            <div className="ot-col" key={statusKey}>
+              <div className="ot-col-head">
+                <span className="ot-dot" style={{ background: col.color }} />
+                <span>{col.label}</span>
+                <em>{items.length}</em>
+              </div>
+              <div className="ot-col-body">
+                {items.map((o) => (
+                  <Card key={o.id} o={o} onEdit={() => onEdit(o)} onDelete={() => onDelete(o.id)}
+                    onStatusChange={(s) => onStatusChange(o, s)} />
+                ))}
+              </div>
             </div>
-            <div className="ot-col-body">
-              {items.map((o) => (
-                <Card key={o.id} o={o} onEdit={() => onEdit(o)} onDelete={() => onDelete(o.id)}
-                  onStatusChange={(s) => onStatusChange(o, s)} />
-              ))}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      {showFade && <div className="ot-board-fade" aria-hidden="true"><ChevronRight size={16} /></div>}
     </div>
   );
 }
@@ -1344,7 +1366,7 @@ function ManualView() {
       <section>
         <h3>Tabs</h3>
         <ul>
-          <li><strong>Board</strong> — your full pipeline as columns; change status right from a card.</li>
+          <li><strong>Board</strong> — your full pipeline as columns; change status right from a card. Scrolls <strong>horizontally</strong> (11 statuses is wider than one screen) — a fade arrow on the right edge shows when there's more to scroll to.</li>
           <li><strong>Not Yet Applied</strong> — saved or drafted ideas, one click from becoming submitted.</li>
           <li><strong>Deadlines</strong> — every dated item, plus adding your own and importing a calendar.</li>
           <li><strong>History</strong> — everything ever submitted, expandable for interview prep, with a star
@@ -1647,6 +1669,13 @@ const CSS = `
   display:flex; flex-direction:column;
 }
 .ot-root ::selection{background:var(--purple-light); color:var(--purple-dark);}
+.ot-gh-badge{
+  position:fixed; top:14px; right:14px; z-index:40;
+  font-size:12.5px; font-weight:500; color:#fff; background:var(--text);
+  padding:6px 14px; border-radius:6px; text-decoration:none;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15); transition:background .15s ease;
+}
+.ot-gh-badge:hover{ background:var(--blue); }
 .ot-header{
   width:100%; background:var(--panel); border-bottom:1px solid var(--line);
 }
@@ -1767,7 +1796,13 @@ const CSS = `
   border-radius:6px; font-size:13px; cursor:pointer;
 }
 .ot-export-menu button:hover, .ot-export-import:hover{ background:var(--purple-light); }
-.ot-board{ display:flex; gap:14px; padding:18px 20px; overflow-x:auto; flex:1; }
+.ot-board-wrap{ position:relative; flex:1; min-height:0; }
+.ot-board{ display:flex; gap:14px; padding:18px 20px; overflow-x:auto; height:100%; }
+.ot-board-fade{
+  position:absolute; top:0; right:0; bottom:0; width:56px; pointer-events:none;
+  background:linear-gradient(to right, rgba(250,249,252,0), var(--ink) 78%);
+  display:flex; align-items:center; justify-content:flex-end; padding-right:6px; color:var(--muted);
+}
 .ot-col{ min-width:230px; max-width:230px; display:flex; flex-direction:column; }
 .ot-col-head{
   display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:var(--muted);
