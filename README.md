@@ -51,5 +51,6 @@ falls back to the browser's own `localStorage`, which means:
 
 The first time anyone opens the page with nothing saved yet (a fresh
 browser, or after clearing storage), it automatically loads with sample
-data pre-populated — useful for a demo, and it disappears the moment real
-data is saved.
+data pre-populated — it cedes to your own data and dashboard the moment you begin
+to save your own data.
+ 
