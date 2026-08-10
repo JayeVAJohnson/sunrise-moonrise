@@ -1,10 +1,20 @@
 # Sunrise Moonrise
 
+[![Built with Claude](https://img.shields.io/badge/Built_with-Claude-7F77DD?style=flat-square)](https://claude.ai)
+
 ![Sunrise Moonrise](banner.png)
 
 A standalone, deployable build of the Sunrise Moonrise opportunities
 tracker — the same app, packaged to run as a plain static website instead
 of inside Claude.ai.
+
+**One UI note:** the Board tab's kanban columns (Saved → In Progress →
+Submitted → ... → Withdrawn) scroll **horizontally** rather than wrapping
+or stacking — there are 11 statuses, so it's wider than one screen. A fade
+with an arrow appears on the right edge whenever there's more to scroll
+to. If you'd rather not scroll horizontally at all, the **Not Yet
+Applied**, **In Progress**, and **Applied** tabs give the same data as
+plain vertical lists.
 
 ## What's in here
 
@@ -42,15 +52,31 @@ npm run serve      # preview at http://localhost:8080
 Inside Claude.ai, this app saves through Claude's own private storage,
 tied to your account. **This standalone build can't do that** — there's no
 Claude account to attach to outside claude.ai. Instead, it automatically
-falls back to the browser's own `localStorage`, which means:
+falls back to the browser's own `localStorage`.
 
-- Data is saved **per browser, per device** — not synced anywhere.
-- Clearing your browser's site data for this page will erase it.
-- Export → Export as JSON still works exactly the same way, and is the
-  right way to back up or move data between devices/browsers.
+Once deployed to GitHub Pages, the app does persist data — but only
+through the browser's own `localStorage`, not through any account or
+server. That means:
+
+- **Persists:** across page reloads, closing/reopening the tab, restarting
+  the browser — as long as it's the same browser on the same device.
+- **Does NOT persist across:** different browsers, different devices,
+  incognito/private windows, or if the person clears their browser's site
+  data/cache.
+- **No cloud sync.** Two people (or the same person on their phone vs.
+  laptop) visiting the same GitHub Pages URL will each get their own
+  separate, disconnected local copy — not a shared one.
+
+It's "persistent" in the sense of surviving normal day-to-day use, but not
+durable the way an account-backed app is. **Export → Export as JSON** is
+the real safety net — it's how someone would actually back up or move
+their data between devices.
 
 The first time anyone opens the page with nothing saved yet (a fresh
 browser, or after clearing storage), it automatically loads with sample
-data pre-populated — it cedes to your own data and dashboard the moment you begin
-to save your own data.
- 
+data pre-populated — it cedes to your own data and dashboard the moment
+you begin to save your own data.
+
+## Credits
+
+Built in collaboration with [Claude](https://claude.ai) (Anthropic).
